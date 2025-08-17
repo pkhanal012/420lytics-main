@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import BrandName from './BrandName';
 
 export default function CallToAction() {
   const [isVisible, setIsVisible] = useState(false);
@@ -70,7 +69,7 @@ export default function CallToAction() {
               ${isVisible ? 'reveal-animation reveal-delay-300' : 'opacity-0'}
             `}
           >
-            Discover how 420lYtics.ai's semantic-driven analytics transform your Cannabis's data into actionable insights. Automate scorecards, optimize your product strategy, and boost your market performance—all powered by advanced Semantic AI.
+            Discover how 420lYtics.ai&apos;s semantic-driven analytics transform your Cannabis&apos;s data into actionable insights. Automate scorecards, optimize your product strategy, and boost your market performance—all powered by advanced Semantic AI.
           </h2>
 
           <a 
