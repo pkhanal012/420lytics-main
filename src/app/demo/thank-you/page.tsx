@@ -41,7 +41,7 @@ export default function ThankYouPage() {
               </div>
               <div className="flex space-x-4 justify-center">
                 <Link
-                  href="/bookdemo"
+                  href="/demo"
                   className="bg-[#078FE7] hover:bg-[#2A9463] text-white py-3 px-8 rounded-md font-medium transition-colors text-lg"
                 >
                   Request Another Demo

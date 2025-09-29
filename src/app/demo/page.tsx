@@ -127,7 +127,7 @@ export default function BookDemoPage() {
                     <input type="hidden" name="_subject" value="New Demo Request from 420lytics" />
                     <input type="hidden" name="_template" value="table" />
                     <input type="hidden" name="_captcha" value="true" />
-                    <input type="hidden" name="_next" value="/bookdemo/thank-you" />
+                    <input type="hidden" name="_next" value="/demo/thank-you" />
                     <input type="text" name="_honey" style={{ display: 'none' }} />
                     
                     {submitStatus.message && !submitStatus.success && (
