@@ -1,11 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import StickyNavbar from '../components/StickyNavbar';
 import Footer from '../components/Footer';
 import ClientWrapper from '../components/ClientWrapper';
 import VideoBackground from '../components/VideoBackground';
 import DemoSection from '../components/DemoSection';
+import {
+  initEmailJS,
+  sendDemoEmail,
+  sendAutoResponseEmail,
+} from "../../lib/emailjs";
 
 export default function BookDemoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,52 +19,67 @@ export default function BookDemoPage() {
     message?: string;
   }>({});
 
+  // Initialize EmailJS on component mount
+  useEffect(() => {
+    initEmailJS();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      // Get form element
-      const formElement = e.currentTarget;
-      
-      // Submit the form directly to FormSubmit
-      formElement.submit();
-      
-      // Add a timeout to show an error if the form doesn't redirect
-      setTimeout(() => {
-        setIsSubmitting(false);
+      // Get form data
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        email: formData.get("email") as string,
+        firstName: formData.get("firstName") as string,
+        lastName: formData.get("lastName") as string,
+        companySize: formData.get("companySize") as string,
+        hearAbout: formData.get("hearAbout") as string,
+      };
+
+      // Send demo email
+      const result = await sendDemoEmail(data);
+
+      if (result.success) {
+        // Send auto-response to user
+        await sendAutoResponseEmail(data.email, "demo");
+
         setSubmitStatus({
-          success: false,
-          message: 'Submission is taking longer than expected. Please try again.'
+          success: true,
+          message:
+            "Thank you for requesting a demo! We'll get back to you within 24-48 hours to schedule your personalized demo.",
         });
-      }, 3000);
-      
-      // The page will be redirected by FormSubmit
-      return;
-      
+      } else {
+        throw new Error("Failed to send email");
+      }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      setIsSubmitting(false);
+      console.error("Error submitting form:", error);
       setSubmitStatus({
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to submit the form. Please try again.'
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to submit the form. Please try again.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const resetForm = () => {
     setSubmitStatus({});
   };
-
   return (
     <ClientWrapper>
       <main className="min-h-screen bg-[#000A18]">
         {/* Header/Navigation */}
         <StickyNavbar />
+        <VideoBackground />
 
         {/* Demo Form Section */}
         <section className="relative min-h-screen w-full overflow-hidden pt-24 sm:pt-32 lg:pt-40">
-          <VideoBackground />
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Left side - Content */}
@@ -92,7 +112,7 @@ export default function BookDemoPage() {
                     </div>
                     <button
                       onClick={resetForm}
-                      className="bg-[#078FE7] hover:bg-[#2A9463] text-white py-3 px-8 rounded-md font-medium transition-colors text-lg"
+                      className="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-md font-medium transition-colors text-lg"
                     >
                       Request Another Demo
                     </button>
@@ -123,7 +143,7 @@ export default function BookDemoPage() {
                         id="email"
                         name="email"
                         placeholder="Email"
-                        className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#078FE7]"
+                        className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         required
                       />
                     </div>
@@ -136,7 +156,7 @@ export default function BookDemoPage() {
                           id="firstName"
                           name="firstName"
                           placeholder="First Name"
-                          className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#078FE7]"
+                          className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           required
                         />
                       </div>
@@ -147,7 +167,7 @@ export default function BookDemoPage() {
                           id="lastName"
                           name="lastName"
                           placeholder="Last Name"
-                          className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#078FE7]"
+                          className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           required
                         />
                       </div>
@@ -158,7 +178,7 @@ export default function BookDemoPage() {
                       <select
                         id="companySize"
                         name="companySize"
-                        className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#078FE7] appearance-none"
+                        className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
                         required
                       >
                         <option value="" disabled selected>Please select an option</option>
@@ -179,14 +199,14 @@ export default function BookDemoPage() {
                         id="hearAbout"
                         name="hearAbout"
                         placeholder="How did you hear about us?"
-                        className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#078FE7]"
+                        className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
 
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className={`w-full ${isSubmitting ? 'bg-gray-500' : 'bg-[#078FE7] hover:bg-[#0670B3]'} text-white py-3 px-6 rounded-md font-medium transition-colors flex justify-center items-center`}
+                      className={`w-full ${isSubmitting ? 'bg-gray-500' : 'bg-green-600 hover:bg-green-700'} text-white py-3 px-6 rounded-md font-medium transition-colors flex justify-center items-center`}
                     >
                       {isSubmitting ? (
                         <>

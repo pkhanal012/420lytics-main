@@ -73,7 +73,7 @@ export default function CallToAction() {
           </h2>
 
           <a 
-            href="/demo" 
+            href="/bookdemo" 
             className={`
               inline-flex items-center px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 
               bg-[#000A18] text-white text-sm sm:text-base rounded-full 

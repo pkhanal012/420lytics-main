@@ -1,11 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StickyNavbar from '../components/StickyNavbar';
 import Footer from '../components/Footer';
 import ClientWrapper from '../components/ClientWrapper';
 import VideoBackground from '../components/VideoBackground';
 import ContactSection from '../components/ContactSection';
+import {
+  initEmailJS,
+  sendContactEmail,
+  sendAutoResponseEmail,
+} from "../../lib/emailjs";
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,38 +19,51 @@ export default function ContactPage() {
     message?: string;
   }>({});
 
+  // Initialize EmailJS on component mount
+  useEffect(() => {
+    initEmailJS();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      // Get form element
-      const formElement = e.currentTarget;
-      
-      // Submit the form directly to FormSubmit
-      formElement.submit();
-      
-      // Add a timeout to show an error if the form doesn't redirect
-      setTimeout(() => {
-        // If we're still on the page after 3 seconds, show an error
-        // This is a fallback in case the form submission failed
-        setIsSubmitting(false);
+      // Get form data
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        email: formData.get("email") as string,
+        name: formData.get("name") as string,
+        company: formData.get("company") as string,
+        message: formData.get("message") as string,
+      };
+
+      // Send contact email
+      const result = await sendContactEmail(data);
+
+      if (result.success) {
+        // Send auto-response to user
+        await sendAutoResponseEmail(data.email, "contact");
+
         setSubmitStatus({
-          success: false,
-          message: 'Submission is taking longer than expected. Please try again.'
+          success: true,
+          message:
+            "Thank you for contacting us! We'll get back to you within 24-48 hours.",
         });
-      }, 3000);
-      
-      // We don't need to do anything else here since the page will redirect
-      return;
-      
+      } else {
+        throw new Error("Failed to send email");
+      }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      setIsSubmitting(false);
+      console.error("Error submitting form:", error);
       setSubmitStatus({
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to submit the form. Please try again.'
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to submit the form. Please try again.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
