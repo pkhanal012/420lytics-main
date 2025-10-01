@@ -35,6 +35,7 @@ export default function BookDemoPage() {
         email: formData.get("email") as string,
         firstName: formData.get("firstName") as string,
         lastName: formData.get("lastName") as string,
+        phone: (formData.get("phone") as string) || "",
         companySize: formData.get("companySize") as string,
         hearAbout: formData.get("hearAbout") as string,
       };
@@ -171,6 +172,19 @@ export default function BookDemoPage() {
                           required
                         />
                       </div>
+                    </div>
+
+                    <div className="mb-6">
+                      <label htmlFor="phone" className="block text-white mb-2">Phone Number (optional)</label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        placeholder="e.g., +1 555-123-4567"
+                        className="w-full py-3 px-4 bg-[#252525] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        pattern="[+]?[0-9 ()-]{7,}"
+                        inputMode="tel"
+                      />
                     </div>
 
                     <div className="mb-6">

@@ -21,6 +21,7 @@ export const sendDemoEmail = async (data: {
   firstName: string;
   lastName: string;
   companySize: string;
+  phone?: string;
   hearAbout: string;
 }) => {
   try {
@@ -35,9 +36,10 @@ export const sendDemoEmail = async (data: {
         product: "420lytics",
         full_name: `${data.firstName} ${data.lastName}`,
         company_size: data.companySize,
+        phone: data.phone || "Not provided",
         hear_about: data.hearAbout,
         subject: "New Request",
-        message: `420lytics: New demo request from ${data.firstName} ${data.lastName} (${data.email}). Company size: ${data.companySize}. How they heard about us: ${data.hearAbout}`,
+        message: `420lytics: New demo request from ${data.firstName} ${data.lastName} (${data.email}). Phone: ${data.phone || "N/A"}. Company size: ${data.companySize}. How they heard about us: ${data.hearAbout}`,
       }
     );
     return { success: true, result };
